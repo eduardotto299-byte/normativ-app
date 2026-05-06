@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#556B2F">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Штабной Норматив</title>
+    <style>
+        :root { --primary: #556B2F; --primary-dark: #3d4d22; --bg: #f5f5f7; --card: #ffffff; --text: #1a1a1a; --text-sec: #666666; --border: #e0e0e0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 40px; -webkit-font-smoothing: antialiased; }
+        .header { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; padding: 20px 16px 16px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .header h1 { font-size: 22px; font-weight: 700; }
+        .tabs { display: flex; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+        .tab { flex: 1; padding: 14px 8px; text-align: center; background: none; border: none; font-size: 15px; font-weight: 600; color: var(--text-sec); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s ease; }
+        .tab.active { color: var(--primary); border-bottom-color: var(--primary); background: #f8f9f5; }
+        .content { padding: 16px; display: none; }
+        .content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .card { background: var(--card); border-radius: 14px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .card-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .segmented-control { display: flex; background: #e9e9eb; border-radius: 9px; padding: 2px; margin-bottom: 16px; }
+        .segment { flex: 1; padding: 8px 4px; text-align: center; background: none; border: none; border-radius: 7px; font-size: 15px; font-weight: 600; color: var(--text-sec); cursor: pointer; transition: all 0.2s; }
+        .segment.active { background: white; color: var(--primary); box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+        .counter-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .counter-row:last-child { border-bottom: none; }
+        .counter-controls { display: flex; align-items: center; gap: 16px; }
+        .counter-btn { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border); background: white; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .counter-btn:active { background: var(--primary); color: white; border-color: var(--primary); }
+        .counter-value { font-size: 18px; font-weight: 700; min-width: 28px; text-align: center; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: transform 0.1s; margin-top: 12px; }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 2px 8px rgba(85,107,47,0.25); }
+        .btn-secondary { background: #e9e9eb; color: var(--text); }
+        .result-card { background: #f8f9f5; border-left: 4px solid var(--primary); padding: 12px; margin-bottom: 8px; border-radius: 8px; }
+        .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .result-title { font-weight: 600; font-size: 15px; }
+        .result-grade { background: var(--primary); color: white; padding: 3px 8px; border-radius: 10px; font-size: 12px; font-weight: 700; }
+        .result-value { color: var(--primary); font-weight: 700; font-size: 15px; }
+        .input-field { width: 100%; padding: 13px; border: 1px solid var(--border); border-radius: 10px; font-size: 16px; margin-bottom: 12px; background: white; }
+        .input-field:focus { outline: none; border-color: var(--primary); }
+        .progress-bar { width: 100%; height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden; margin: 12px 0; }
+        .progress-fill { height: 100%; background: var(--primary); transition: width 0.4s ease; }
+        .stat-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+        .stat-item:last-child { border-bottom: none; }
+        .stat-label { font-size: 14px; color: var(--text-sec); }
+        .stat-value { font-weight: 700; font-size: 16px; }
+        .expandable { cursor: pointer; }
+        .expandable-content { display: none; padding-top: 8px; }
+        .expandable-content.show { display: block; }
+        .chevron { transition: transform 0.3s; display: inline-block; }
+        .chevron.rotated { transform: rotate(180deg); }
+        .checkbox-item { display: flex; align-items: center; padding: 10px 0; gap: 12px; }
+        .checkbox-item input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="header"><h1>🎯 Штабной Норматив</h1></div>
+    <div class="tabs">
+        <button type="button" class="tab active" data-tab="0">🎯 Планировщик</button>
+        <button type="button" class="tab" data-tab="1">📈 Прогресс</button>
+    </div>
+    
+    <div id="tab-0" class="content active">
+        <div class="card">
+            <div class="card-title">Целевая оценка</div>
+            <div class="segmented-control" id="grade-control">
+                <button type="button" class="segment" data-grade="3">3</button>
+                <button type="button" class="segment active" data-grade="4">4</button>
+                <button type="button" class="segment" data-grade="5">5</button>
+            </div>
+        </div>
+        <div class="card">
+            <div class="counter-row">
+                <span class="counter-label">Количество человек</span>
+                <div class="counter-controls">
+                    <button type="button" class="counter-btn" id="dec-people">−</button>
+                    <span class="counter-value" id="people-count">1</span>
+                    <button type="button" class="counter-btn" id="inc-people">+</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" id="subjects-container"></div>
+        <button type="button" class="btn btn-primary" id="calc-plan">📊 Рассчитать план</button>
+        <div id="plan-results"></div>
+        <button type="button" class="btn btn-secondary" id="clear-plan" style="display:none;"> Очистить</button>
+    </div>
+    
+    <div id="tab-1" class="content">
+        <div class="card">
+            <div class="card-title">📈 Детальный расчет прогресса</div>
+            <input type="number" class="input-field" id="planned-count" placeholder="План (сколько должно быть)" inputmode="numeric">
+            <input type="number" class="input-field" id="actual-count" placeholder="Факт (сколько выполнили)" inputmode="numeric">
+            <div style="margin: 16px 0; padding: 12px; background: #f8f8f8; border-radius: 10px;">
+                <div style="font-weight: 600; margin-bottom: 12px; font-size: 14px;">Распределение оценок:</div>
+                <input type="number" class="input-field" id="count-5" placeholder="На оценку 5" inputmode="numeric">
+                <input type="number" class="input-field" id="count-4" placeholder="На оценку 4" inputmode="numeric">
+                <input type="number" class="input-field" id="count-3" placeholder="На оценку 3" inputmode="numeric">
+            </div>
+            <button type="button" class="btn btn-primary" id="calc-progress">Рассчитать</button>
+        </div>
+        <div id="progress-results"></div>
+        <button type="button" class="btn btn-secondary" id="clear-progress" style="display:none;">🔄 Очистить</button>
+    </div>
+
+    <script>
+        const standards = {
+            'ОП': [{number:'10',five:'15 сек',four:'17 сек',three:'19 сек'},{number:'11',five:'25 сек',four:'27 сек',three:'32 сек'},{number:'13',five:'33 сек',four:'38 сек',three:'43 сек'}],
+            'РХБЗ': [{number:'1',five:'7 сек',four:'8 сек',three:'10 сек'},{number:'4',five:'3:00',four:'3:20',three:'4:00'},{number:'7',five:'3:20',four:'3:40',three:'4:30'},{number:'8',five:'35 сек',four:'40 сек',three:'50 сек'},{number:'13',five:'8 сек',four:'10 сек',three:'12 сек'}],
+            'ТСБП': [{number:'27',five:'50 сек',four:'55 сек',three:'60 сек'},{number:'28',five:'5 сек',four:'4 сек',three:'3 сек'},{number:'32',five:'50 сек',four:'55 сек',three:'60 сек'},{number:'33',five:'1:15',four:'1:25',three:'1:35'}],
+            'ПС': [{number:'1',five:'2:30',four:'3:30',three:'4:30'}],
+            'ИП': [{number:'1',five:'25 сек',four:'27 сек',three:'32 сек'},{number:'6',five:'15 сек',four:'17 сек',three:'21 сек'}],
+            'ВТ': [{number:'1',five:'40 сек',four:'45 сек',three:'55 сек'},{number:'3',five:'45 сек',four:'50 сек',three:'1:00'}],
+            'ВМП': [{number:'1',five:'1:10',four:'1:15',three:'1:30'},{number:'2',five:'18 сек',four:'20 сек',three:'25 сек'}]
+        };
+        const fpExercises = [
+            {number:'4',unit:'раз',thresholds:{'до 25':{five:'14',four:'12',three:'10'},'25-30':{five:'13',four:'11',three:'9'},'30-35':{five:'12',four:'10',three:'8'},'35-40':{five:'10',four:'8',three:'6'},'40-45':{five:'8',four:'6',three:'4'}}},
+            {number:'51',unit:'сек',thresholds:{'до 25':{five:'14,0',four:'14,4',three:'15,2'},'25-30':{five:'14,2',four:'14,6',three:'15,6'},'30-35':{five:'14,8',four:'15,4',three:'16,2'},'35-40':{five:'15,2',four:'15,8',three:'16,8'},'40-45':{five:'16,0',four:'16,6',three:'17,6'}}},
+            {number:'52',unit:'сек',thresholds:{'до 25':{five:'26,5',four:'27,5',three:'28,5'},'25-30':{five:'27,5',four:'28,5',three:'29,5'},'30-35':{five:'28,5',four:'29,5',three:'30,5'},'35-40':{five:'29,5',four:'30,5',three:'31,5'},'40-45':{five:'31,0',four:'32,0',three:'34,0'}}},
+            {number:'55',unit:'мин',thresholds:{'до 25':{five:'3:20',four:'3:30',three:'3:55'},'25-30':{five:'3:25',four:'3:35',three:'4:05'},'30-35':{five:'3:30',four:'3:40',three:'4:15'},'35-40':{five:'3:45',four:'4:00',three:'4:35'},'40-45':{five:'3:55',four:'4:10',three:'4:40'}}},
+            {number:'56',unit:'мин',thresholds:{'до 25':{five:'12:10',four:'12:25',three:'13:00'},'25-30':{five:'12:20',four:'12:35',three:'13:10'},'30-35':{five:'12:30',four:'12:45',three:'13:20'},'35-40':{five:'14:00',four:'14:45',three:'15:30'},'40-45':{five:'-',four:'-',three:'-'}}}
+        ];
+        const ageGroups = ['до 25', '25-30', '30-35', '35-40', '40-45'];
+        let targetGrade = 4, peopleCount = 1, selectedNorms = {}, selectedFpNorms = {}, selectedFpAge = 'до 25';
+        const storage = { get: (k) => { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} } };
+
+        function init() { renderSubjects(); setupTabs(); setupControls(); loadState(); }
+        function renderSubjects() {
+            const container = document.getElementById('subjects-container');
+            let html = '';
+            for (const [subj, norms] of Object.entries(standards)) {
+                html += `<div class="expandable" data-subj="${subj}"><div class="card-title"><span>${subj}</span><span class="chevron">▼</span></div><div class="expandable-content">${norms.map(n => `<label class="checkbox-item"><input type="checkbox" data-norm="${subj}_${n.number}"><span>Норматив №${n.number}</span></label>`).join('')}</div></div>`;
+            }
+            html += `<div class="expandable" data-subj="ФП"><div class="card-title"><span>🏃 ФП (Физподготовка)</span><span class="chevron">▼</span></div><div class="expandable-content"><div style="margin-bottom: 12px;"><div style="font-size: 13px; margin-bottom: 8px; font-weight: 500;">Возрастная группа:</div><div class="segmented-control" id="age-control">${ageGroups.map((age, i) => `<button type="button" class="segment ${i===0?'active':''}" data-age="${age}">${age}</button>`).join('')}</div></div>${fpExercises.map(ex => `<label class="checkbox-item"><input type="checkbox" data-fp="${ex.number}"><span>№${ex.number} (${ex.unit})</span></label>`).join('')}</div></div>`;
+            container.innerHTML = html;
+            document.querySelectorAll('.expandable').forEach(el => {
+                el.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'LABEL') return;
+                    this.querySelector('.expandable-content').classList.toggle('show');
+                    this.querySelector('.chevron').classList.toggle('rotated');
+                });
+            });
+        }
+        function setupTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+                });
+            });
+        }
+        function setupControls() {
+            document.querySelectorAll('#grade-control .segment').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('#grade-control .segment').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    targetGrade = parseInt(btn.dataset.grade);
+                });
+            });
+            document.querySelectorAll('#age-control .segment').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('#age-control .segment').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    selectedFpAge = btn.dataset.age;
+                    storage.set('fpAge', selectedFpAge);
+                });
+            });
+            document.getElementById('dec-people').addEventListener('click', () => { if(peopleCount>1){peopleCount--; document.getElementById('people-count').textContent=peopleCount;}});
+            document.getElementById('inc-people').addEventListener('click', () => { peopleCount++; document.getElementById('people-count').textContent=peopleCount;});
+            document.getElementById('calc-plan').addEventListener('click', calculatePlan);
+            document.getElementById('clear-plan').addEventListener('click', () => { document.getElementById('plan-results').innerHTML=''; document.getElementById('clear-plan').style.display='none';});
+            document.getElementById('calc-progress').addEventListener('click', calculateProgress);
+            document.getElementById('clear-progress').addEventListener('click', () => { ['planned-count','actual-count','count-5','count-4','count-3'].forEach(id => document.getElementById(id).value=''); document.getElementById('progress-results').innerHTML=''; document.getElementById('clear-progress').style.display='none';});
+            document.addEventListener('change', e => {
+                if (e.target.dataset.norm) { e.target.checked ? selectedNorms[e.target.dataset.norm] = true : delete selectedNorms[e.target.dataset.norm]; }
+                if (e.target.dataset.fp) { e.target.checked ? selectedFpNorms[e.target.dataset.fp] = true : delete selectedFpNorms[e.target.dataset.fp]; }
+                storage.set('norms', {selectedNorms, selectedFpNorms});
+            });
+        }
+        function calculatePlan() {
+            const resDiv = document.getElementById('plan-results');
+            if (Object.keys(selectedNorms).length === 0 && Object.keys(selectedFpNorms).length === 0) { alert('Выберите хотя бы один норматив!'); return; }
+            let html = '<div class="card" style="margin-top:16px;"><div class="card-title">📋 Результаты</div>';
+            for (let p = 1; p <= peopleCount; p++) {
+                html += `<div style="margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid var(--border);"><div style="font-weight:700; margin-bottom:8px;">👤 Человек #${p} (Общая: ${targetGrade})</div>`;
+                for (const key of Object.keys(selectedNorms)) {
+                    const [subj, num] = key.split('_');
+                    const data = standards[subj].find(n => n.number === num);
+                    const val = data[targetGrade===5?'five':targetGrade===4?'four':'three'];
+                    html += `<div class="result-card"><div class="result-header"><span class="result-title">${subj} №${num}</span><span class="result-grade">${targetGrade}</span></div><div class="result-value">${val}</div></div>`;
+                }
+                for (const num of Object.keys(selectedFpNorms)) {
+                    const ex = fpExercises.find(e => e.number === num);
+                    const th = ex.thresholds[selectedFpAge];
+                    const val = targetGrade===5?th.five:targetGrade===4?th.four:th.three;
+                    html += `<div class="result-card"><div class="result-header"><span class="result-title">ФП №${num}</span><span class="result-grade">${targetGrade}</span></div><div class="result-value">${val} ${ex.unit}</div></div>`;
+                }
+                html += '</div>';
+            }
+            html += '</div>';
+            resDiv.innerHTML = html;
+            document.getElementById('clear-plan').style.display = 'block';
+            resDiv.scrollIntoView({behavior:'smooth', block:'start'});
+        }
+        function calculateProgress() {
+            const planned = parseInt(document.getElementById('planned-count').value) || 0;
+            const actual = parseInt(document.getElementById('actual-count').value) || 0;
+            const c5 = parseInt(document.getElementById('count-5').value) || 0;
+            const c4 = parseInt(document.getElementById('count-4').value) || 0;
+            const c3 = parseInt(document.getElementById('count-3').value) || 0;
+            if (!planned || !actual) { alert('Введите план и факт!'); return; }
+            const total = c5 + c4 + c3;
+            const execPercent = Math.min(100, Math.round((actual/planned)*100));
+            const avg = total ? ((c5*5 + c4*4 + c3*3)/total).toFixed(2) : '0.00';
+            let html = `<div class="card" style="margin-top:16px;"><div style="text-align:center; padding:20px; background:#f8f9f5; border-radius:12px; margin-bottom:16px;"><div style="font-size:14px; color:var(--text-sec); margin-bottom:8px;">Выполнение плана</div><div style="font-size:42px; font-weight:700; color:var(--primary);">${execPercent}%</div><div class="progress-bar"><div class="progress-fill" style="width:${execPercent}%"></div></div><div style="font-size:13px; color:var(--text-sec);">из ${planned} выполнили ${actual}</div></div><div style="margin-bottom:16px;"><div style="font-weight:600; margin-bottom:12px; font-size:14px;">Распределение оценок:</div>${c5?`<div class="stat-item"><span class="stat-label">Оценка 5</span><span class="stat-value" style="color:var(--primary);">${c5} (${Math.round(c5/total*100)}%)</span></div>`:''}${c4?`<div class="stat-item"><span class="stat-label">Оценка 4</span><span class="stat-value" style="color:#7a9947;">${c4} (${Math.round(c4/total*100)}%)</span></div>`:''}${c3?`<div class="stat-item"><span class="stat-label">Оценка 3</span><span class="stat-value" style="color:#888;">${c3} (${Math.round(c3/total*100)}%)</span></div>`:''}</div><div style="padding:16px; background:#f8f8f8; border-radius:10px; text-align:center;"><div style="font-size:13px; color:var(--text-sec);">Средний балл</div><div style="font-size:28px; font-weight:700; color:var(--primary);">${avg}</div></div></div>`;
+            document.getElementById('progress-results').innerHTML = html;
+            document.getElementById('clear-progress').style.display = 'block';
+            document.getElementById('progress-results').scrollIntoView({behavior:'smooth', block:'start'});
+        }
+        function loadState() {
+            const saved = storage.get('norms');
+            if (saved) {
+                selectedNorms = saved.selectedNorms || {};
+                selectedFpNorms = saved.selectedFpNorms || {};
+                document.querySelectorAll('input[data-norm]').forEach(cb => { cb.checked = !!selectedNorms[cb.dataset.norm]; });
+                document.querySelectorAll('input[data-fp]').forEach(cb => { cb.checked = !!selectedFpNorms[cb.dataset.fp]; });
+            }
+            const savedAge = storage.get('fpAge');
+            if (savedAge) {
+                selectedFpAge = savedAge;
+                document.querySelectorAll('#age-control .segment').forEach(b => { b.classList.toggle('active', b.dataset.age === savedAge); });
+            }
+        }
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
